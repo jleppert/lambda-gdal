@@ -1,0 +1,14 @@
+prefix=/home/ec2-user/lambda/local
+exec_prefix=/home/ec2-user/lambda/local
+libdir=/home/ec2-user/lambda/local/lib
+includedir=/home/ec2-user/lambda/local/include/freetype2
+
+Name: FreeType 2
+URL: http://freetype.org
+Description: A free, high-quality, and portable font engine.
+Version: 18.0.12
+Requires:
+Requires.private: zlib, libpng
+Libs: -L${libdir} -lfreetype
+Libs.private: 
+Cflags: -I${includedir}

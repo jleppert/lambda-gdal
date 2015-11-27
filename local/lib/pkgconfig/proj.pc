@@ -1,0 +1,11 @@
+prefix=/home/ec2-user/lambda/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: proj
+Description: Cartographic Projections Library.
+Requires:
+Version: 4.9.2
+Libs: -L${libdir} -lproj
+Cflags: -I${includedir}

@@ -1,0 +1,18 @@
+prefix=/home/ec2-user/lambda/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+sysconfdir=${prefix}/etc
+localstatedir=${prefix}/var
+PACKAGE=fontconfig
+confdir=${sysconfdir}/fonts
+cachedir=${localstatedir}/cache/${PACKAGE}
+
+Name: Fontconfig
+Description: Font configuration and customization library
+Version: 2.11.94
+Requires:  freetype2
+Requires.private:  expat
+Libs: -L${libdir} -lfontconfig
+Libs.private: -L/home/ec2-user/lambda/local/lib -lexpat   -L/home/ec2-user/lambda/local/lib -lfreetype    
+Cflags: -I${includedir} -I/home/ec2-user/lambda/local/include   -I/home/ec2-user/lambda/local/include/freetype2 -I/home/ec2-user/lambda/local/include/libpng16    

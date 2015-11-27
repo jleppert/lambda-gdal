@@ -1,0 +1,13 @@
+prefix=/home/ec2-user/lambda/local
+exec_prefix=/home/ec2-user/lambda/local
+libdir=/home/ec2-user/lambda/local/lib
+includedir=/home/ec2-user/lambda/local/include
+
+Name: harfbuzz
+Description: HarfBuzz text shaping library
+Version: 1.1.0
+
+Libs: -L${libdir} -lharfbuzz
+Libs.private:   
+Requires.private: glib-2.0 >= 2.16 
+Cflags: -I${includedir}/harfbuzz
