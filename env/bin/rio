@@ -1,0 +1,10 @@
+#!/home/ec2-user/lambda/env/bin/python2.7
+# EASY-INSTALL-ENTRY-SCRIPT: 'rasterio==0.29.0','console_scripts','rio'
+__requires__ = 'rasterio==0.29.0'
+import sys
+from pkg_resources import load_entry_point
+
+if __name__ == '__main__':
+    sys.exit(
+        load_entry_point('rasterio==0.29.0', 'console_scripts', 'rio')()
+    )

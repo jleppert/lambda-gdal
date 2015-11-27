@@ -1,0 +1,12 @@
+var Canvas = require('canvas'),
+    Image  = Canvas.Image,
+    canvas = new Canvas(200, 200),
+    ctx = canvas.getContext('2d');
+
+var gdal = require('gdal');
+
+ctx.beginPath();
+ctx.arc(100, 75, 50, 0, 2*Math.PI);
+ctx.stroke();
+
+process.send({ circle: canvas.toDataURL() });
