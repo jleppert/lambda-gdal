@@ -1,0 +1,26 @@
+{
+  "gdal": {
+    "python_package":"GDAL-1.11.3-py2.7-linux-x86_64.egg"
+  },
+  "s3": {
+    "access": "AKIAJMF6B3PFOD7HNSVA",
+    "secret": "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",
+    "code": {
+      "bucket": "lambda-drone",
+      "key": "bundle.zip"
+    }
+  },
+  "lambda": {
+    "params": {
+      "Role": "arn:aws:iam::736460024992:role/lambdaUser",
+      "FunctionName": "tileTest",
+      "memorySize": 1024,
+      "timeout": 600,
+      "description": "Creates heightmap tiles from elevation DSM"
+    },
+    "opts": {
+      "region": "us-west-2",
+      "profile": "default"
+    }
+  }
+}
