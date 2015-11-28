@@ -1,0 +1,16 @@
+<Map srs="$proj4">
+  <Style name="contours 1m style">
+    <Rule>
+      <LineSymbolizer stroke="#000" stroke-width="0.7" />
+      <TextSymbolizer face-name="DejaVu Sans Book" size="9" fill="#000" halo-radius="1" placement="line">[height]</TextSymbolizer> 
+    </Rule>
+  </Style> 
+
+  <Layer name="contours 1m">
+    <StyleName>contours 1m style</StyleName>
+    <Datasource>
+      <Parameter name="type">shape</Parameter>
+      <Parameter name="file">$shapefile</Parameter>
+    </Datasource>
+  </Layer>   
+</Map>
