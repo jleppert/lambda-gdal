@@ -4,7 +4,7 @@
   },
   "s3": {
     "access": "",
-    "secret": "x8PFY//",
+    "secret": "",
     "code": {
       "bucket": "lambda-drone",
       "key": "bundle.zip"
