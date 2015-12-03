@@ -1,13 +1,55 @@
 <Map srs="$proj4">
-  <Style name="contours 1m style">
+  <Style name="color relief style">
+    <Rule>
+      <RasterSymbolizer mode="normal" />
+    </Rule>
+  </Style>
+
+  <Style name="slopeshade style">
+    <Rule>
+      <RasterSymbolizer opacity="0.1" mode="multiply" />
+    </Rule>
+  </Style>
+
+  <Style name="hillshade style">
+    <Rule>
+      <RasterSymbolizer opacity="0.6" mode="multiply" />
+    </Rule>
+  </Style>
+  
+  <Style name="contours style">
     <Rule>
       <LineSymbolizer stroke="#000" stroke-width="0.7" />
       <TextSymbolizer face-name="DejaVu Sans Book" size="9" fill="#000" halo-radius="1" placement="line">[height]</TextSymbolizer> 
     </Rule>
-  </Style> 
+  </Style>
 
-  <Layer name="contours 1m">
-    <StyleName>contours 1m style</StyleName>
+  <Layer name="color relief">
+    <StyleName>color relief style</StyleName>
+    <Datasource>
+      <Parameter name="type">gdal</Parameter>
+      <Parameter name="file">$destColorReliefTif</Parameter>
+    </Datasource>
+  </Layer>
+
+  <Layer name="slopeshade">
+    <StyleName>slopeshade style</StyleName>
+    <Datasource>
+      <Parameter name="type">gdal</Parameter>
+      <Parameter name="file">$destSlopeShadeTif</Parameter>
+    </Datasource>
+  </Layer>
+
+  <Layer name="hillshade">
+    <StyleName>slopeshade style</StyleName>
+    <Datasource>
+      <Parameter name="type">gdal</Parameter>
+      <Parameter name="file">$destHillShadeTif</Parameter>
+    </Datasource>
+  </Layer>
+
+  <Layer name="contours">
+    <StyleName>contours style</StyleName>
     <Datasource>
       <Parameter name="type">shape</Parameter>
       <Parameter name="file">$shapefile</Parameter>
