@@ -3,8 +3,8 @@
     "python_package":"GDAL-1.11.3-py2.7-linux-x86_64.egg"
   },
   "s3": {
-    "access": "AKIAJMF6B3PFOD7HNSVA",
-    "secret": "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",
+    "access": "",
+    "secret": "",
     "code": {
       "bucket": "lambda-drone",
       "key": "bundle.zip"
