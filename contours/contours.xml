@@ -1,10 +1,6 @@
 <Map srs="$proj4">
-  <Style name="color relief style">
-    <Rule>
-      <RasterSymbolizer mode="normal" />
-    </Rule>
-  </Style>
-
+  $colorReliefStyles
+  
   <Style name="slopeshade style">
     <Rule>
       <RasterSymbolizer opacity="0.1" mode="multiply" />
@@ -24,14 +20,8 @@
     </Rule>
   </Style>
 
-  <Layer name="color relief">
-    <StyleName>color relief style</StyleName>
-    <Datasource>
-      <Parameter name="type">gdal</Parameter>
-      <Parameter name="file">$destColorReliefTif</Parameter>
-    </Datasource>
-  </Layer>
-
+  $colorReliefLayers
+  
   <Layer name="slopeshade">
     <StyleName>slopeshade style</StyleName>
     <Datasource>
