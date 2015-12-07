@@ -31,7 +31,7 @@
   </Layer>
 
   <Layer name="hillshade">
-    <StyleName>slopeshade style</StyleName>
+    <StyleName>hillshade style</StyleName>
     <Datasource>
       <Parameter name="type">gdal</Parameter>
       <Parameter name="file">$destHillShadeTif</Parameter>

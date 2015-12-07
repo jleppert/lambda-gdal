@@ -6,7 +6,7 @@
 // select array_to_json(array_agg(markers)) from markers where image_id = 1184 AND volume IS NOT NULL;
 var fs = require('fs');
 var crypto = require('crypto');
-var sys = require('sys')
+var sys = require('sys');
 var exec = require('child_process').exec;
 var args = process.argv.slice(2);
 var path = require('path');

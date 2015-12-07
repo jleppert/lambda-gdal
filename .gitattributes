@@ -77,3 +77,7 @@ local/lib.new/libgif.so.7 filter=lfs diff=lfs merge=lfs -text
 local/lib.new/libpixman-1.so.0 filter=lfs diff=lfs merge=lfs -text
 local/lib.new/libpng16.so.16 filter=lfs diff=lfs merge=lfs -text
 local/lib.new/libproj.so.9 filter=lfs diff=lfs merge=lfs -text
+dsm2.tif filter=lfs diff=lfs merge=lfs -text
+dsm_1.tif filter=lfs diff=lfs merge=lfs -text
+dsm2_m.tif filter=lfs diff=lfs merge=lfs -text
+contours/dsm2_m.tif filter=lfs diff=lfs merge=lfs -text
