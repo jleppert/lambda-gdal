@@ -25,12 +25,13 @@ gdal2tiles=$(which gdal2tiles.py)
 gdalsrsinfo=$(which gdalsrsinfo)
 gdalinfo=$(which gdalinfo)
 gdal_translate=$(which gdal_translate)
-gdal_warp=$(which gdal_warp)
+gdal_warp=$(which gdalwarp)
 gdaltransform=$(which gdaltransform)
 gdal_contour=$(which gdal_contour)
 gdaldem=$(which gdaldem)
 nik2img=$(which nik2img.py)
 pileRange="$SCRIPT_PATH/pileRange.js"
+cropMap="$SCRIPT_PATH/cropMap.js"
 
 function gdal_extent() {
     EXTENT=$($gdalinfo $1 |\
@@ -114,6 +115,7 @@ translate="$gdal_translate -of VRT -a_ullr $extent -a_srs $srs $outputDir/$outpu
 warp="$gdal_warp -of VRT -s_srs $srs -t_srs EPSG:3857 $outputDir/contours.vrt $outputDir/contours_mercator.vrt"
 
 map="$nik2img $pileStyle $outputDir/$outputPng -d $dimensions -e $extent"
+crop="$cropMap $piles $outputDir/contours.png \"$proj4\" $outputDir $outputDir/markerContours.json"
 tile="$gdal2tiles -p mercator -z $zoom $outputDir/contours_mercator.vrt"
 
 mkdir -p $outputDir
@@ -127,7 +129,8 @@ echo $slopeShadeTif
 echo $pileShades
 echo $map
 echo $translate
-echo $warp
-cd $outputDir
-echo $tile
+echo $crop
+#echo $warp
+#cd $outputDir
+#echo $tile
 echo -n "Contour tiles generated to: " $outputDir

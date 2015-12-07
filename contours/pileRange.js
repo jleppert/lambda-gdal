@@ -88,21 +88,6 @@ function gdalemCrop(croppedColorTif) {
   }
 }
 
-
-function boundingBoxAroundPolyCoords (coords) {
-  var xAll = [], yAll = [];
-
-  for (var i = 0; i < coords[0].length; i++) {
-    xAll.push(coords[0][i][1]);
-    yAll.push(coords[0][i][0]);
-  }
-
-  xAll = xAll.sort(function (a,b) { return a - b });
-  yAll = yAll.sort(function (a,b) { return a - b });
-
-  return [ [xAll[0], yAll[0]], [xAll[xAll.length - 1], yAll[yAll.length - 1]] ];
-}
-
 process.on('exit', function() {
   fs.writeFileSync(args[4], styleXML.replace(/\$colorReliefStyles/g, styles.join("\n")).replace(/\$colorReliefLayers/g, layers.join("\n")));
   console.log("Wrote output map style", args[4]);
