@@ -11,29 +11,30 @@ var exec = require('child_process').exec;
 var args = process.argv.slice(2);
 var path = require('path');
 var proj4 = require('proj4');
-
 var markers = JSON.parse(fs.readFileSync(args[0]));
-var markerInfo = JSON.parse(fs.readFileSync(args[3]));
+var markerInfo = JSON.parse(fs.readFileSync(args[4]));
 
 markers.forEach(function(marker) {
   var markerFile = randName("marker", ".json");
-  var croppedPng = randName("cropped", ".png");
+  var croppedTiff = randName("cropped", ".tiff");
 
   var bbox = boundingBoxAroundPolyCoords(marker.geojson.coordinates);
-  var pMin = proj4(args[2], [bbox[0][0], bbox[0][1]]),
-      pMax = proj4(args[2], [bbox[1][0], bbox[1][1]);
-  fs.writeFileSync(markerFile, JSON.stringify(marker.geojson));
-  exec("gdalwarp -of png -te " + pMin[0] + " " + pMin[1] + " " + pMax[0] + " " + pMax[1] + " " + args[1] + " " + croppedPng, gdalwarp(markerFile, marker, croppedPng));
+  var pMin = proj4(args[2], bbox[0]),
+      pMax = proj4(args[2], bbox[1]);
+  
+  exec("gdalwarp -te " + pMin[0] + " " + pMin[1] + " " + pMax[0] + " " + pMax[1] + " " + args[1] + " " + croppedTiff, gdalwarp(markerFile, marker, croppedTiff));
 });
 
-function gdalwarp(markerFile, marker, croppedPng) {
+function gdalwarp(markerFile, marker, croppedTiff) {
   return function(error, stdout, stderr) {
-    markerInfo[marker.id].cropped = croppedPng;
+    console.log("cropped image", croppedTiff);
+    //console.log(error, stdout, stderr);
+    //markerInfo[marker.id].cropped = croppedPng;
   }
 }
 
 process.on("exit", function() {
-  fs.writeFileSync(args[4], fs.writeFileSync(markerInfo));
+  fs.writeFileSync(args[4], JSON.stringify(markerInfo));
 });
 
 function boundingBoxAroundPolyCoords (coords) {
@@ -47,11 +48,11 @@ function boundingBoxAroundPolyCoords (coords) {
   xAll = xAll.sort(function (a,b) { return a - b });
   yAll = yAll.sort(function (a,b) { return a - b });
 
-  return [ [xAll[0], yAll[0]], [xAll[xAll.length - 1], yAll[yAll.length - 1]] ];
+  return [ [yAll[0], xAll[0]], [yAll[yAll.length - 1], xAll[xAll.length - 1]] ];
 }
 
 function randName(prefix, extension) {
-  var tempDir = args[2] || null;
+  var tempDir = args[3] || null;
   var filename = (prefix || "") + crypto.randomBytes(4).readUInt32LE(0) + (extension || "");
   return tempDir ? path.join(tempDir, filename) : filename;
 }

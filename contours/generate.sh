@@ -79,7 +79,7 @@ function dimensions_value() {
     sed "s/,//g" |\
     xargs)
   DIMARRAY=($DIMENSIONS)
-  echo -n "${DIMARRAY[1]} ${DIMARRAY[0]}"
+  echo -n "${DIMARRAY[0]} ${DIMARRAY[1]}"
 }
 
 base_style=$(cat $style)
@@ -103,19 +103,30 @@ destColorSlope="$outputDir/color_slope.txt"
 extent=$(gdal_extent $dsm)
 nodata=$(nodata_value $dsm)
 dimensions=$(dimensions_value $dsm)
+mercator="EPSG:3857"
 
 # these commands will be run
+warp="$gdal_warp $dsm -t_srs $mercator -r bilinear $outputDir/mercator_dsm.tif"
+
+# scale to meters and preserve nodata
+warpToMeters1="$gdal_warp -dstnodata -10000 $outputDir/mercator_dsm.tif $outputDir/mercator_dsm_meters1.tif"
+warpToMeters2="$gdal_translate -scale 0 100000 0 30480 -a_nodata -3048 $outputDir/mercator_dsm_meters1.tif $outputDir/mercator_dsm_meters2.tif"
+
+# scale to imperial (US-FT) and preserve nodata
+warpToImperial1="$gdal_warp -dstnodata -3048 $outputDir/mercator_dsm.tif $outputDir/mercator_dsm_imperial1.tif"
+warpToImperial2="$gdal_translate -scale 0 30480 0 100000 -a_nodata -10000 $outputDir/mercator_dsm_imperial1.tif $outputDir/mercator_dsm_imperial2.tif"
+
 contour="$gdal_contour -a height $dsm -i $interval $outputDir/contours.shp"
 hillshadeTif="$gdaldem hillshade $dsm $destHillShadeTif"
 pileShades="$pileRange $piles $dsm \"$colors\" $destStyle $pileStyle $outputDir/markerContours.json $outputDir"
 slopeTif="$gdaldem slope $dsm $outputDir/$outputSlopeTif"
 slopeShadeTif="$gdaldem color-relief $outputDir/$outputSlopeTif $destColorSlope $destSlopeShadeTif"
 
-translate="$gdal_translate -of VRT -a_ullr $extent -a_srs $srs $outputDir/$outputPng $outputDir/contours.vrt"
-warp="$gdal_warp -of VRT -s_srs $srs -t_srs EPSG:3857 $outputDir/contours.vrt $outputDir/contours_mercator.vrt"
+translate="$gdal_translate -of VRT -a_ullr $extent -a_srs '$srs' $outputDir/$outputPng $outputDir/contours.vrt"
+#warp="$gdal_warp -of VRT -s_srs '$srs' -t_srs EPSG:3857 $outputDir/contours.vrt $outputDir/contours_mercator.vrt"
 
 map="$nik2img $pileStyle $outputDir/$outputPng -d $dimensions -e $extent"
-crop="$cropMap $piles $outputDir/contours.png \"$proj4\" $outputDir $outputDir/markerContours.json"
+crop="$cropMap $piles $outputDir/contours.vrt \"$proj4\" $outputDir $outputDir/markerContours.json"
 tile="$gdal2tiles -p mercator -z $zoom $outputDir/contours_mercator.vrt"
 
 mkdir -p $outputDir
