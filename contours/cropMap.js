@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // this script crops a generated map by a json list of markers
-// usage: cropMap.js <markers.json> <map.vrt> <proj> <tmpdir> <markerInfo.json>
+// usage: cropMap.js <markers.json> <map.vrt> <proj> <tmpdir> <markerInfo.json> <s3bucket> <reportId>
 // markers.json is an array of markers from the site
 // to create markers for use with this script:
 // select array_to_json(array_agg(markers)) from markers where image_id = 1184 AND volume IS NOT NULL;
@@ -12,7 +12,6 @@ var args = process.argv.slice(2);
 var path = require('path');
 var proj4 = require('proj4');
 var markers = JSON.parse(fs.readFileSync(args[0]));
-var markerInfo = JSON.parse(fs.readFileSync(args[4]));
 
 markers.forEach(function(marker) {
   var markerFile = randName("marker", ".json");
@@ -27,12 +26,24 @@ markers.forEach(function(marker) {
 
 function gdalwarp(markerFile, marker, croppedTiff) {
   return function(error, stdout, stderr) {
+    var croppedPng = randName('croppedPng', '.png');
+    exec("gdal_translate -OF png " + croppedTiff + " " + croppedPng, gdaltranslate(markerFile, marker, croppedPng));
     console.log("cropped image", croppedTiff);
   }
 }
 
+function gdaltranslate(markerFile, marker, croppedPng) {
+  return function(error, stdout, stderr) {
+    exec("aws s3 cp " + croppedPng + " s3://" + s3Bucket + "/" + reportId + "/", function() {
+      console.log("Uploaded " + croppedPng + " to " + s3Bucket + "/" + reportId);
+    });
+  }
+}
+
 process.on("exit", function() {
-  fs.writeFileSync(args[4], JSON.stringify(markerInfo));
+  exec("aws s3 cp " + markerInfo + "s3:// " + s3Bucket + "/" + reportId + "/", function() {
+    console.log("Uploaded markerInfo file " + markerInfo + " to " + s3Bucket + "/" + reportId);
+  });
 });
 
 function boundingBoxAroundPolyCoords (coords) {
