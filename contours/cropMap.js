@@ -28,8 +28,6 @@ markers.forEach(function(marker) {
 function gdalwarp(markerFile, marker, croppedTiff) {
   return function(error, stdout, stderr) {
     console.log("cropped image", croppedTiff);
-    //console.log(error, stdout, stderr);
-    //markerInfo[marker.id].cropped = croppedPng;
   }
 }
 

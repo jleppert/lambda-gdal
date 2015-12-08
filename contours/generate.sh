@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # this script generates and tiles contours from a DSM
-# usage: contours.sh <dsm.tif> <interval> <color_slope> <mapnik_style> <zoom> <piles.json> <colors>
+# usage: contours.sh <dsm.tif> <interval> <color_slope> <mapnik_style> <zoom> <piles.json> <colors> <unit>
 # example: contours.sh dsm.tif 1.0 style.xml 15-22 piles.json "#d53e4f,#fc8d59,#fee08b,#e6f598,#99d594,#3288bd"
 # outputs: the directory that contains the tileset
 dsm=$1
@@ -10,6 +10,7 @@ style=$4
 zoom=$5
 piles=$6
 colors=$7
+unit=$8
 outputDir=/tmp/$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32)
 outputHillShadeTif=$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32).tif
 outputColorReliefTif=$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32).tif
@@ -105,16 +106,18 @@ nodata=$(nodata_value $dsm)
 dimensions=$(dimensions_value $dsm)
 mercator="EPSG:3857"
 
+mercatorDsm="$outputDir/mercator_dsm.tif"
+
 # these commands will be run
-warp="$gdal_warp $dsm -t_srs $mercator -r bilinear $outputDir/mercator_dsm.tif"
+warp="$gdal_warp $dsm -t_srs $mercator -r bilinear $mercatorDsm"
 
 # scale to meters and preserve nodata
-warpToMeters1="$gdal_warp -dstnodata -10000 $outputDir/mercator_dsm.tif $outputDir/mercator_dsm_meters1.tif"
-warpToMeters2="$gdal_translate -scale 0 100000 0 30480 -a_nodata -3048 $outputDir/mercator_dsm_meters1.tif $outputDir/mercator_dsm_meters2.tif"
+warpToMetersSetNoData="$gdal_warp -dstnodata -10000 $mercatorDsm $mercatorDsm.1"
+warpToMetersTranslate="$gdal_translate -scale 0 100000 0 30480 -a_nodata -3048 $mercatorDsm.1 $outputDir/$mercatorDsm.2"
 
 # scale to imperial (US-FT) and preserve nodata
-warpToImperial1="$gdal_warp -dstnodata -3048 $outputDir/mercator_dsm.tif $outputDir/mercator_dsm_imperial1.tif"
-warpToImperial2="$gdal_translate -scale 0 30480 0 100000 -a_nodata -10000 $outputDir/mercator_dsm_imperial1.tif $outputDir/mercator_dsm_imperial2.tif"
+warpToImperialSetNoData="$gdal_warp -dstnodata -3048 $mercatorDsm $mercatorDsm.1"
+warpToImperialTranslate="$gdal_translate -scale 0 30480 0 100000 -a_nodata -10000 $mercatorDsm.1 $mercatorDsm.2"
 
 contour="$gdal_contour -a height $dsm -i $interval $outputDir/contours.shp"
 hillshadeTif="$gdaldem hillshade $dsm $destHillShadeTif"
@@ -123,7 +126,7 @@ slopeTif="$gdaldem slope $dsm $outputDir/$outputSlopeTif"
 slopeShadeTif="$gdaldem color-relief $outputDir/$outputSlopeTif $destColorSlope $destSlopeShadeTif"
 
 translate="$gdal_translate -of VRT -a_ullr $extent -a_srs '$srs' $outputDir/$outputPng $outputDir/contours.vrt"
-#warp="$gdal_warp -of VRT -s_srs '$srs' -t_srs EPSG:3857 $outputDir/contours.vrt $outputDir/contours_mercator.vrt"
+warp="$gdal_warp -of VRT -s_srs '$srs' -t_srs EPSG:3857 $outputDir/contours.vrt $outputDir/contours_mercator.vrt"
 
 map="$nik2img $pileStyle $outputDir/$outputPng -d $dimensions -e $extent"
 crop="$cropMap $piles $outputDir/contours.vrt \"$proj4\" $outputDir $outputDir/markerContours.json"
@@ -132,6 +135,24 @@ tile="$gdal2tiles -p mercator -z $zoom $outputDir/contours_mercator.vrt"
 mkdir -p $outputDir
 echo "$style" >> "$destStyle"
 echo -e "$base_color_slope" >> "$destColorSlope"
+#echo $proj4
+unitsRegex="\+units=([^ ]+)"
+[[ $proj4 =~ $unitsRegex ]]
+  if [[ ${BASH_REMATCH[1]} == "us-ft" ]]; then
+    if [ $unit == "m" ]; then
+      echo $warpToMetersSetNoData
+      echo $warpToMetersTranslate
+    fi
+  else
+    if [[ ${BASH_REMATCH[1]} == "m" ]]; then
+      if [[ $unit == "ft" ]]; then
+        echo $warpToImperialSetNoData
+        echo $warpToImperialTranslate
+      fi
+    fi 
+  fi
+#echo $dsm_unit
+exit
 echo $contour
 echo $hillshadeTif
 echo $reliefTif
